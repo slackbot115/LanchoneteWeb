@@ -37,12 +37,27 @@
                             <td>
                                 <a href="{{route("produto.show", $produto->id)}}" class="btn btn-primary">Mostrar</a>
                                 <a href="{{route("produto.edit", $produto->id)}}" class="btn btn-secondary">Editar</a>
-                                <a href="{{route("produto.destroy", $produto->id)}}" class="btn btn-danger">Excluir</a>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#excluirModal">Excluir</button>
                             </td>
                     </tr>
                 @endforeach
             </tbody>
           </table>
-    </div>    
+    </div>
+
+    <div class="modal fade" id="excluirModal" tabindex="-1" aria-labelledby="excluirModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    Deseja realmente excluir este registro?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                    <a href="{{route("produto.destroy", $produto->id)}}" class="btn btn-danger" >Excluir registro</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </body>
 </html>
