@@ -38,7 +38,9 @@
         </div>
         <div class="form-group">
             <label for="urlImageProduto">urlImage</label>
-            <input name="urlImage" type="text" class="form-control" id="urlImageProduto" placeholder="Digite a urlImage do produto..." value="{{$produtoSelecionado->urlImage}}" disabled>
+            <br>
+            {{-- <input name="urlImage" type="text" class="form-control" id="urlImageProduto" placeholder="Digite a urlImage do produto..." value="{{$produtoSelecionado->urlImage}}" disabled> --}}
+            <img src="{{$produtoSelecionado->urlImage}}" width="20%" height="20%" alt="Imagem do Produto">
         </div>
         <div class="my-1">
             <a class="btn btn-primary" href="{{route("produto.index")}}">Voltar</a>
