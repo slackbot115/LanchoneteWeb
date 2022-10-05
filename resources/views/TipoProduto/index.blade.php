@@ -33,7 +33,14 @@
                             <td>
                                 <a href="{{route("tipoproduto.show", $tipoProduto->id)}}" class="btn btn-primary">Mostrar</a>
                                 <a href="{{route("tipoproduto.edit", $tipoProduto->id)}}" class="btn btn-secondary">Editar</a>
-                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#excluirModal">Excluir</button>
+                                <a 
+                                    href="#" 
+                                    class="btn btn-danger class-button-destroy" 
+                                    data-bs-toggle="modal" 
+                                    data-bs-target="#destroyModal"
+                                    value="{{route("tipoproduto.destroy", $tipoProduto->id)}}"> 
+                                        Excluir
+                                </a>
                             </td>
                     </tr>
                 @endforeach
@@ -41,19 +48,41 @@
           </table>
     </div>
 
-    <div class="modal fade" id="excluirModal" tabindex="-1" aria-labelledby="excluirModalLabel" aria-hidden="true">
+    <div class="modal fade" id="destroyModal" tabindex="-1" aria-labelledby="destroyModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="destroyModalLabel">Confirmação de remoção</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
                 <div class="modal-body">
-                    Deseja realmente excluir este registro?
+                    Deseja realmente remover este recurso?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
-                    <a href="{{route("tipoproduto.destroy", $tipoProduto->id)}}" class="btn btn-danger" >Excluir registro</a>
+                    <form id="id-form-modal-botao-remover" action="" method="post">
+                        @csrf
+                        @method('DELETE')
+                        <input type="submit" class="btn btn-danger" value="Confirmar remoção">
+                    </form>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        const arrayBtnRemover = document.querySelectorAll(".class-button-destroy");
+        const formModalBotaoRemover = document.querySelector("#id-form-modal-botao-remover");
+        //console.log(arrayBtnRemover);
+        arrayBtnRemover.forEach(btnRemover => {
+            btnRemover.addEventListener("click", configurarBotaoRemoverModal);
+        });
+        function configurarBotaoRemoverModal(){
+            // Imprimindo o conteudo do atributo value do botão que chamou essa função
+            //console.log( this.getAttribute("value") );
+            //console.log(formModalBotaoRemover);
+            formModalBotaoRemover.setAttribute("action", this.getAttribute("value"));
+        }
+    </script>
 
 </body>
 </html>
