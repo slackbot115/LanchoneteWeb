@@ -15,14 +15,38 @@ class ProdutoController extends Controller
      */
     public function index()
     {
-        $produtos = DB::select(
-            "SELECT produtos.id as id,
-                    produtos.nome as nome,
-                    produtos.preco as preco,
-                    tipo_produtos.descricao as descricao
-            FROM PRODUTOS
-            JOIN TIPO_PRODUTOS ON produtos.Tipo_Produtos_id = tipo_produtos.id;"
-        );
+        try {
+            $produtos = DB::select(
+                "SELECT produtos.id as id,
+                        produtos.nome as nome,
+                        produtos.preco as preco,
+                        tipo_produtos.descricao as descricao
+                FROM PRODUTOS
+                JOIN TIPO_PRODUTOS ON produtos.Tipo_Produtos_id = tipo_produtos.id;"
+            );
+        } catch (\Throwable $th) {
+            return view("Produto/index")
+                ->with("produtos", [])
+                ->with("message", [$th->getMessage(), 'danger']);
+        }
+        return view("Produto/index")->with("produtos", $produtos);
+    }
+
+    public function indexMessage($message){
+        try {
+            $produtos = DB::select(
+                "SELECT produtos.id as id,
+                        produtos.nome as nome,
+                        produtos.preco as preco,
+                        tipo_produtos.descricao as descricao
+                FROM PRODUTOS
+                JOIN TIPO_PRODUTOS ON produtos.Tipo_Produtos_id = tipo_produtos.id;"
+            );
+        } catch (\Throwable $th) {
+            return view("Produto/index")
+                ->with("produtos", [])
+                ->with("message", [$th->getMessage(), 'danger']);
+        }
         return view("Produto/index")->with("produtos", $produtos);
     }
 
@@ -45,15 +69,20 @@ class ProdutoController extends Controller
      */
     public function store(Request $request)
     {
-        $produto = new Produto();
-        $produto->nome = $request->nome;
-        $produto->preco = $request->preco;
-        $produto->Tipo_Produtos_id = $request->Tipo_Produtos_id;
-        $produto->ingredientes = $request->ingredientes;
-        $produto->urlImage = $request->urlImage;
-        $produto->save();
+        try {
+            $produto = new Produto();
+            $produto->nome = $request->nome;
+            $produto->preco = $request->preco;
+            $produto->Tipo_Produtos_id = $request->Tipo_Produtos_id;
+            $produto->ingredientes = $request->ingredientes;
+            $produto->urlImage = $request->urlImage;
+            $produto->save();
+        } catch (\Throwable $th) {
+            return $this->indexMessage([$th->getMessage(), 'danger']);
+        }
 
-        return \Redirect::route('produto.index');
+        return $this->indexMessage(['Produto cadastrado com sucesso', 'success']);
+        // return \Redirect::route('produto.index');
     }
 
     /**
@@ -64,19 +93,27 @@ class ProdutoController extends Controller
      */
     public function show($id)
     {
-        $produtoSelecionado = DB::select(
-            "SELECT produtos.id,
-                    produtos.nome,
-                    produtos.preco,
-                    produtos.ingredientes,
-                    produtos.urlImage,
-                    tipo_produtos.descricao
-            FROM PRODUTOS
-            JOIN TIPO_PRODUTOS ON produtos.Tipo_Produtos_id = tipo_produtos.id
-            WHERE produtos.id = $id;"
-        );
-        // $produtoSelecionado = Produto::find($id);
-        return view("Produto/show")->with("produtoSelecionado", $produtoSelecionado[0]);
+        try {
+            $produtoSelecionado = DB::select(
+                "SELECT produtos.id,
+                        produtos.nome,
+                        produtos.preco,
+                        produtos.ingredientes,
+                        produtos.urlImage,
+                        tipo_produtos.descricao
+                FROM PRODUTOS
+                JOIN TIPO_PRODUTOS ON produtos.Tipo_Produtos_id = tipo_produtos.id
+                WHERE produtos.id = $id;"
+            );
+
+            if(isset($produtoSelecionado)){
+                return view("Produto/show")->with("produtoSelecionado", $produtoSelecionado[0]);
+            }
+
+            return $this->indexMessage(['O produto não foi encontrado', 'warning']);
+        } catch (\Throwable $th) {
+            return $this->indexMessage([$th->getMessage(), 'danger']);
+        }
     }
 
     /**
@@ -87,23 +124,32 @@ class ProdutoController extends Controller
      */
     public function edit($id)
     {
-        $produtoSelecionado = DB::select(
-            "SELECT produtos.id,
-                    produtos.nome,
-                    produtos.preco,
-                    produtos.ingredientes,
-                    produtos.urlImage,
-                    tipo_produtos.id as tipo_produto_id,
-                    tipo_produtos.descricao
-            FROM PRODUTOS
-            JOIN TIPO_PRODUTOS ON produtos.Tipo_Produtos_id = tipo_produtos.id
-            WHERE produtos.id = $id;"
-        );
+        try {
+            $produtoSelecionado = DB::select(
+                "SELECT produtos.id,
+                        produtos.nome,
+                        produtos.preco,
+                        produtos.ingredientes,
+                        produtos.urlImage,
+                        tipo_produtos.id as tipo_produto_id,
+                        tipo_produtos.descricao
+                FROM PRODUTOS
+                JOIN TIPO_PRODUTOS ON produtos.Tipo_Produtos_id = tipo_produtos.id
+                WHERE produtos.id = $id;"
+            );
 
-        $tipoProdutos = DB::select("SELECT * FROM TIPO_PRODUTOS");
-        return view("Produto/edit")
+            if(isset($produtoSelecionado)){
+                $tipoProdutos = TipoProduto::all();
+
+                return view("Produto/edit")
                     ->with("produtoSelecionado", $produtoSelecionado[0])
                     ->with("tipoProdutos", $tipoProdutos);
+            }
+
+            return $this->indexMessage(['O produto não foi encontrado', 'warning']);
+        } catch (\Throwable $th) {
+            return $this->indexMessage([$th->getMessage(), 'danger']);
+        }
     }
 
     /**
@@ -115,15 +161,25 @@ class ProdutoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $produto = Produto::find($id);
-        $produto->nome = $request->nome;
-        $produto->preco = $request->preco;
-        $produto->ingredientes = $request->ingredientes;
-        $produto->urlImage = $request->urlImage;
-        $produto->Tipo_Produtos_id = $request->Tipo_Produtos_id;
-        $produto->update();
+        try {
+            $produto = Produto::find($id);
 
-        return \Redirect::route('produto.index');
+            if(isset($produto)) {
+                $produto->nome = $request->nome;
+                $produto->preco = $request->preco;
+                $produto->ingredientes = $request->ingredientes;
+                $produto->urlImage = $request->urlImage;
+                $produto->Tipo_Produtos_id = $request->Tipo_Produtos_id;
+                $produto->update();
+
+                return $this->indexMessage(["Produto atualizado com sucesso", "success"]);
+            }
+
+            return $this->indexMessage(['O produto não foi encontrado', 'warning']);
+        } catch (\Throwable $th) {
+            return $this->indexMessage([$th->getMessage(), 'danger']);
+        }
+        // return \Redirect::route('produto.index');
     }
 
     /**
@@ -134,7 +190,17 @@ class ProdutoController extends Controller
      */
     public function destroy($id)
     {
-        Produto::destroy($id);
-        return \Redirect::route('produto.index');
+        try {
+            $produto = Produto::find($id);
+
+            if( isset($produto) ) {
+                $produto->delete();
+
+                return $this->indexMessage( ["Produto removido com sucesso", "success"] );
+            }
+            return $this->indexMessage( ["O produto não foi encontrado", "warning"] );
+        } catch (\Throwable $th) {
+            return $this->indexMessage( [$th->getMessage(), "danger"] );
+        }
     }
 }
