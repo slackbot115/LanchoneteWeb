@@ -14,6 +14,13 @@
 </head>
 <body>
     <div class="container">
+        @if(isset($message))
+            <div class="alert alert-{{$message[1]}} alert-dismissible fade show" role="alert">
+                <span>{{$message[0]}}</span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
         <a class="btn btn-primary" href="{{route("tipoproduto.create")}}">Criar Tipo de Produto</a>
         <a class="btn btn-primary" href="#">Voltar</a>
 
@@ -33,12 +40,12 @@
                             <td>
                                 <a href="{{route("tipoproduto.show", $tipoProduto->id)}}" class="btn btn-primary">Mostrar</a>
                                 <a href="{{route("tipoproduto.edit", $tipoProduto->id)}}" class="btn btn-secondary">Editar</a>
-                                <a 
-                                    href="#" 
-                                    class="btn btn-danger class-button-destroy" 
-                                    data-bs-toggle="modal" 
+                                <a
+                                    href="#"
+                                    class="btn btn-danger class-button-destroy"
+                                    data-bs-toggle="modal"
                                     data-bs-target="#destroyModal"
-                                    value="{{route("tipoproduto.destroy", $tipoProduto->id)}}"> 
+                                    value="{{route("tipoproduto.destroy", $tipoProduto->id)}}">
                                         Excluir
                                 </a>
                             </td>

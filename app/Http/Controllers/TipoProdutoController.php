@@ -15,7 +15,24 @@ class TipoProdutoController extends Controller
      */
     public function index()
     {
-        $tipoProdutos = DB::select("SELECT * FROM TIPO_PRODUTOS");
+        try {
+            $tipoProdutos = DB::select("SELECT * FROM TIPO_PRODUTOS");
+        } catch (\Throwable $th) {
+            return view("TipoProduto/index")
+                ->with("tipoProdutos", [])
+                ->with("message", [$th->getMessage(), 'danger']);
+        }
+        return view("TipoProduto/index")->with("tipoProdutos", $tipoProdutos);
+    }
+
+    public function indexMessage($message){
+        try {
+            $tipoProdutos = DB::select("SELECT * FROM TIPO_PRODUTOS");
+        } catch (\Throwable $th) {
+            return view("TipoProduto/index")
+                ->with("tipoProdutos", [])
+                ->with("message", [$th->getMessage(), 'danger']);
+        }
         return view("TipoProduto/index")->with("tipoProdutos", $tipoProdutos);
     }
 
@@ -37,11 +54,17 @@ class TipoProdutoController extends Controller
      */
     public function store(Request $request)
     {
-        $tipoProduto = new TipoProduto();
-        $tipoProduto->descricao = $request->descricao;
-        $tipoProduto->save();
+        try{
+            $tipoProduto = new TipoProduto();
+            $tipoProduto->descricao = $request->descricao;
+            $tipoProduto->save();
+        }
+        catch(\Throwable $th){
+            return $this->indexMessage([$th->getMessage(), 'danger']);
+        }
 
-        return \Redirect::route('tipoproduto.index');
+        return $this->indexMessage(['Tipo de produto cadastrado com sucesso', 'success']);
+        // return \Redirect::route('tipoproduto.index');
     }
 
     /**
@@ -52,8 +75,17 @@ class TipoProdutoController extends Controller
      */
     public function show($id)
     {
-        $tipoProdutoSelecionado = TipoProduto::find($id);
-        return view("TipoProduto/show")->with("tipoProdutoSelecionado", $tipoProdutoSelecionado);
+        try {
+            $tipoProdutoSelecionado = TipoProduto::find($id);
+
+            if(isset($tipoProdutoSelecionado)){
+                return view("TipoProduto/show")->with("tipoProdutoSelecionado", $tipoProdutoSelecionado);
+            }
+
+            return $this->indexMessage(['O tipo de produto não foi encontrado', 'warning']);
+        } catch (\Throwable $th) {
+            return $this->indexMessage([$th->getMessage(), 'danger']);
+        }
     }
 
     /**
@@ -64,8 +96,17 @@ class TipoProdutoController extends Controller
      */
     public function edit($id)
     {
-        $tipoProdutoSelecionado = TipoProduto::find($id);
-        return view("TipoProduto/edit")->with("tipoProdutoSelecionado", $tipoProdutoSelecionado);
+        try {
+            $tipoProdutoSelecionado = TipoProduto::find($id);
+
+            if(isset($tipoProdutoSelecionado)){
+                return view("TipoProduto/edit")->with("tipoProdutoSelecionado", $tipoProdutoSelecionado);
+            }
+
+            return $this->indexMessage(['O tipo de produto não foi encontrado', 'warning']);
+        } catch (\Throwable $th) {
+            return $this->indexMessage([$th->getMessage(), 'danger']);
+        }
     }
 
     /**
@@ -77,11 +118,22 @@ class TipoProdutoController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $tipoProduto = TipoProduto::find($id);
-        $tipoProduto->descricao = $request->descricao;
-        $tipoProduto->save();
+        try {
+            $tipoProduto = TipoProduto::find($id);
 
-        return \Redirect::route('tipoproduto.index');
+            if(isset($tipoProduto)){
+                $tipoProduto->descricao = $request->descricao;
+                $tipoProduto->save();
+
+                return $this->indexMessage(['Tipo de produto atualizado com sucesso', 'success']);
+            }
+
+            return $this->indexMessage(['O tipo de produto não foi encontrado', 'warning']);
+        } catch (\Throwable $th) {
+            return $this->indexMessage([$th->getMessage(), 'danger']);
+        }
+
+        //return \Redirect::route('tipoproduto.index');
     }
 
     /**
@@ -92,7 +144,18 @@ class TipoProdutoController extends Controller
      */
     public function destroy($id)
     {
-        TipoProduto::destroy($id);
-        return \Redirect::route('tipoproduto.index');
+        try{
+            $tipoProdutoSelecionado = TipoProduto::find($id);
+            if(isset($tipoProdutoSelecionado)){
+                $tipoProdutoSelecionado->delete();
+
+                return $this->indexMessage(['Tipo de produto removido com sucesso', 'success']);
+            }
+            return $this->indexMessage(['O tipo de produto não foi encontrado', 'warning']);
+        } catch (\Throwable $th) {
+            return $this->indexMessage([$th->getMessage(), 'danger']);
+        }
+
+        //return \Redirect::route('tipoproduto.index');
     }
 }
