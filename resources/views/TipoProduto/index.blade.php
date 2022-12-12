@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('name')
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +25,7 @@
         @endif
 
         <a class="btn btn-primary" href="{{route("tipoproduto.create")}}">Criar Tipo de Produto</a>
-        <a class="btn btn-primary" href="#">Voltar</a>
+        <a class="btn btn-primary" href="{{route("admin.dashboard")}}">Voltar</a>
 
         <table class="table table-hover">
             <thead>
@@ -93,3 +96,4 @@
 
 </body>
 </html>
+@endsection
